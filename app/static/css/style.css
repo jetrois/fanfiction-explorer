@@ -1,8 +1,59 @@
 /* Custom styles for Fanfiction Explorer */
 
-/* Global styles */
+/* Global styles - Full width layout */
 body {
     background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Full width container overrides */
+.container {
+    max-width: none !important;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Responsive container padding based on screen size */
+@media (min-width: 576px) {
+    .container, .container-fluid {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container, .container-fluid {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container, .container-fluid {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container, .container-fluid {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .container, .container-fluid {
+        padding-left: 60px;
+        padding-right: 60px;
+    }
 }
 
 /* Card hover effects */
@@ -243,4 +294,162 @@ canvas {
 
 .slide-in {
     animation: slideIn 0.3s ease-out;
+}
+
+/* Sortable Table Headers */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.sortable:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    color: #007bff;
+}
+
+.sortable::after {
+    content: '\2195'; /* Up/Down arrow */
+    position: absolute;
+    right: 8px;
+    opacity: 0.5;
+    font-size: 0.8rem;
+}
+
+.sortable.sort-asc::after {
+    content: '\2191'; /* Up arrow */
+    opacity: 1;
+    color: #007bff;
+}
+
+.sortable.sort-desc::after {
+    content: '\2193'; /* Down arrow */
+    opacity: 1;
+    color: #007bff;
+}
+
+.sortable.sort-asc,
+.sortable.sort-desc {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    color: #007bff !important;
+}
+
+/* Clickable Fandom Links */
+.fandom-link {
+    cursor: pointer;
+    text-decoration: none !important;
+    color: #007bff;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: inline-block;
+}
+
+.fandom-link:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: #0056b3 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.fandom-link:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 123, 255, 0.3);
+}
+
+/* Author and other clickable elements */
+.author-link {
+    cursor: pointer;
+    text-decoration: none !important;
+    color: #6c757d;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: inline-block;
+}
+
+.author-link:hover {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #495057 !important;
+    transform: translateY(-1px);
+}
+
+/* Table cell improvements for full width */
+.table-responsive {
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Full width table layout adjustments */
+@media (min-width: 768px) {
+    .table th,
+    .table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Specific column widths for optimal display */
+    .table .col-title { width: 25%; }
+    .table .col-author { width: 15%; }
+    .table .col-fandom { width: 15%; }
+    .table .col-genre { width: 12%; }
+    .table .col-language { width: 8%; }
+    .table .col-status { width: 8%; }
+    .table .col-words { width: 8%; }
+    .table .col-chapters { width: 6%; }
+    .table .col-rating { width: 6%; }
+    .table .col-updated { width: 10%; }
+}
+
+@media (max-width: 767px) {
+    /* Mobile responsive table */
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem 0.3rem;
+    }
+    
+    /* Hide less important columns on mobile */
+    .table .col-genre,
+    .table .col-chapters,
+    .table .col-updated {
+        display: none;
+    }
+}
+
+/* Loading indicator for sorting */
+.table-loading {
+    position: relative;
+}
+
+.table-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Enhanced hover effects for table rows */
+.table-hover tbody tr {
+    transition: all 0.2s ease-in-out;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+    transform: translateX(2px);
+    box-shadow: 2px 0 8px rgba(0, 123, 255, 0.1);
 }

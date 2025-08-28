@@ -40,52 +40,52 @@
                 {% if results %}
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover mb-0">
+                        <table class="table table-striped table-hover table-sortable mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Title</th>
-                                    <th>Author</th>
-                                    <th>Fandom</th>
-                                    <th>Genre</th>
-                                    <th>Language</th>
-                                    <th>Status</th>
-                                    <th>Words</th>
-                                    <th>Chapters</th>
-                                    <th>Rating</th>
-                                    <th>Updated</th>
+                                    <th class="sortable col-title" data-sort="title" data-type="text">TITLE</th>
+                                    <th class="sortable col-author" data-sort="author" data-type="text">AUTHOR</th>
+                                    <th class="sortable col-fandom" data-sort="fandom" data-type="text">FANDOM</th>
+                                    <th class="sortable col-genre" data-sort="genre" data-type="text">GENRE</th>
+                                    <th class="sortable col-language" data-sort="language" data-type="text">LANGUAGE</th>
+                                    <th class="sortable col-status" data-sort="status" data-type="text">STATUS</th>
+                                    <th class="sortable col-words" data-sort="words" data-type="numeric">WORDS</th>
+                                    <th class="sortable col-chapters" data-sort="chapters" data-type="numeric">CHAPTERS</th>
+                                    <th class="sortable col-rating" data-sort="rating" data-type="text">RATING</th>
+                                    <th class="sortable col-updated" data-sort="updated" data-type="date">UPDATED</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for story in results %}
                                 <tr>
-                                    <td>
-                                        <a href="{{ url_for('main.story_detail', story_id=story[10]) }}" class="text-decoration-none fw-bold">
+                                    <td class="col-title">
+                                        <a href="{{ url_for('main.story_detail', story_id=story[10]) }}" class="text-decoration-none fw-bold text-dark">
                                             {{ truncate_text(story[0], 50) }}
                                         </a>
                                     </td>
-                                    <td>
-                                        <a href="{{ url_for('main.search', author=story[1]) }}" class="text-decoration-none">
+                                    <td class="col-author">
+                                        <span class="author-link" title="Click to view all stories by this author">
                                             {{ truncate_text(story[1], 30) }}
-                                        </a>
+                                        </span>
                                     </td>
-                                    <td>
-                                        <a href="{{ url_for('main.search', category=story[2]) }}" class="text-decoration-none">
+                                    <td class="col-fandom">
+                                        <span class="fandom-link" title="Click to view all stories in this fandom">
                                             {{ truncate_text(story[2], 25) }}
-                                        </a>
+                                        </span>
                                     </td>
-                                    <td>{{ truncate_text(story[3], 20) }}</td>
-                                    <td>{{ story[4] }}</td>
-                                    <td>
+                                    <td class="col-genre">{{ truncate_text(story[3], 20) }}</td>
+                                    <td class="col-language">{{ story[4] }}</td>
+                                    <td class="col-status">
                                         <span class="badge bg-{{ 'success' if story[5] == 'Completed' else 'warning' }}">
                                             {{ story[5] }}
                                         </span>
                                     </td>
-                                    <td>{{ format_number(story[6]) }}</td>
-                                    <td>{{ format_number(story[7]) }}</td>
-                                    <td>
+                                    <td class="col-words text-end">{{ format_number(story[6]) }}</td>
+                                    <td class="col-chapters text-end">{{ format_number(story[7]) }}</td>
+                                    <td class="col-rating text-center">
                                         <span class="badge bg-secondary">{{ story[8] }}</span>
                                     </td>
-                                    <td class="small">{{ story[9] }}</td>
+                                    <td class="col-updated small">{{ story[9] }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
