@@ -5,6 +5,7 @@ from app.utils import (
     format_number, truncate_text
 )
 import math
+from urllib.parse import urlencode
 
 main_bp = Blueprint('main', __name__)
 
@@ -182,6 +183,18 @@ def browse():
         return render_template('errors/500.html'), 500
 
 
+def build_pagination_url(endpoint, page_num, query_args):
+    """Build pagination URL with proper query parameters"""
+    # Create a copy of query_args and update page
+    params = dict(query_args)
+    params['page'] = page_num
+    
+    # Remove empty parameters
+    clean_params = {k: v for k, v in params.items() if v}
+    
+    return f"{endpoint}?{urlencode(clean_params)}"
+
+
 # Template filters
 @main_bp.app_template_filter('number')
 def number_filter(value):
@@ -193,3 +206,9 @@ def number_filter(value):
 def truncate_filter(value, length=100):
     """Truncate text to specified length"""
     return truncate_text(value, length)
+
+
+@main_bp.app_template_global()
+def pagination_url(endpoint, page_num, query_args):
+    """Template global function to build pagination URLs"""
+    return build_pagination_url(endpoint, page_num, query_args)
