@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}{{ story.Title }} - Fanfiction Explorer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">{{ story.Title or 'Untitled Story' }}</h1>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="card-text">
+                                <strong>Author:</strong> 
+                                <a href="{{ url_for('main.search', author=story.Author) }}" class="text-decoration-none">
+                                    {{ story.Author or 'Unknown Author' }}
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="card-text">
+                                <strong>Fandom:</strong> 
+                                <a href="{{ url_for('main.search', category=story.Category) }}" class="text-decoration-none">
+                                    {{ story.Category or 'Unknown' }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="card-text">
+                                <strong>Genre:</strong> {{ story.Genre or 'Not specified' }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="card-text">
+                                <strong>Language:</strong> {{ story.Language or 'Unknown' }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <p class="card-text">
+                                <strong>Status:</strong>
+                                <span class="badge bg-{{ 'success' if story.Status == 'Completed' else 'warning' }}">
+                                    {{ story.Status or 'Unknown' }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="card-text">
+                                <strong>Rating:</strong>
+                                <span class="badge bg-secondary">{{ story.Rating or 'Not rated' }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="card-text">
+                                <strong>Words:</strong> {{ format_number(story.word_count) }}
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="card-text">
+                                <strong>Chapters:</strong> {{ format_number(story.chapter_count) }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if story.Summary %}
+                    <div class="mb-4">
+                        <h5>Summary</h5>
+                        <div class="bg-light p-3 rounded">
+                            {{ story.Summary }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <strong>Published:</strong> {{ story.Published or 'Unknown' }}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <strong>Updated:</strong> {{ story.Updated or 'Unknown' }}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <strong>Packaged:</strong> {{ story.Packaged or 'Unknown' }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if story['Story URL'] %}
+                    <div class="mb-3">
+                        <a href="{{ story['Story URL'] }}" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-external-link-alt"></i> Read Original Story
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if story['Author URL'] %}
+                    <div class="mb-3">
+                        <a href="{{ story['Author URL'] }}" class="btn btn-outline-secondary" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-user"></i> Visit Author's Profile
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Story Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Word Count:</span>
+                            <strong>{{ format_number(story.word_count) }}</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Chapter Count:</span>
+                            <strong>{{ format_number(story.chapter_count) }}</strong>
+                        </div>
+                    </div>
+                    
+                    {% if story.word_count and story.chapter_count and story.chapter_count > 0 %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Avg Words/Chapter:</span>
+                            <strong>{{ format_number((story.word_count // story.chapter_count)|int) }}</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Publisher:</span>
+                            <strong>{{ story.Publisher or 'Unknown' }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Related Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.search', author=story.Author) }}" class="btn btn-outline-primary">
+                            More by this Author
+                        </a>
+                        <a href="{{ url_for('main.search', category=story.Category) }}" class="btn btn-outline-secondary">
+                            More in this Fandom
+                        </a>
+                        {% if story.Genre %}
+                        <a href="{{ url_for('main.search', genre=story.Genre.split(',')[0].strip()) }}" class="btn btn-outline-info">
+                            Similar Genre
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

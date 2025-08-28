@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Stories - Fanfiction Explorer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Browse All Stories</h1>
+            <p class="lead">Discover fanfiction stories from our extensive database</p>
+        </div>
+    </div>
+    
+    <!-- Quick stats -->
+    {% if pagination %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Showing {{ pagination.per_page * (pagination.page - 1) + 1 }}-{{ pagination.per_page * pagination.page if pagination.per_page * pagination.page < pagination.total_count else pagination.total_count }} 
+                of {{ format_number(pagination.total_count) }} total stories
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Results -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Latest Stories</h5>
+                    <div>
+                        <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-search"></i> Advanced Search
+                        </a>
+                    </div>
+                </div>
+                
+                {% if results %}
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Fandom</th>
+                                    <th>Genre</th>
+                                    <th>Language</th>
+                                    <th>Status</th>
+                                    <th>Words</th>
+                                    <th>Chapters</th>
+                                    <th>Rating</th>
+                                    <th>Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for story in results %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('main.story_detail', story_id=story[10]) }}" class="text-decoration-none fw-bold">
+                                            {{ truncate_text(story[0], 50) }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.search', author=story[1]) }}" class="text-decoration-none">
+                                            {{ truncate_text(story[1], 30) }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.search', category=story[2]) }}" class="text-decoration-none">
+                                            {{ truncate_text(story[2], 25) }}
+                                        </a>
+                                    </td>
+                                    <td>{{ truncate_text(story[3], 20) }}</td>
+                                    <td>{{ story[4] }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if story[5] == 'Completed' else 'warning' }}">
+                                            {{ story[5] }}
+                                        </span>
+                                    </td>
+                                    <td>{{ format_number(story[6]) }}</td>
+                                    <td>{{ format_number(story[7]) }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ story[8] }}</span>
+                                    </td>
+                                    <td class="small">{{ story[9] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+                    <h5>No stories available</h5>
+                    <p class="text-muted">There seems to be an issue loading the stories.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if pagination and pagination.total_pages > 1 %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Browse pagination">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous page -->
+                    {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.browse', page=pagination.prev_num) }}">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </span>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Page numbers -->
+                    {% set start_page = [pagination.page - 2, 1]|max %}
+                    {% set end_page = [pagination.page + 2, pagination.total_pages]|min %}
+                    
+                    {% if start_page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.browse', page=1) }}">1</a>
+                        </li>
+                        {% if start_page > 2 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% for page_num in range(start_page, end_page + 1) %}
+                        {% if page_num == pagination.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('main.browse', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if end_page < pagination.total_pages %}
+                        {% if end_page < pagination.total_pages - 1 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.browse', page=pagination.total_pages) }}">{{ pagination.total_pages }}</a>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Next page -->
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.browse', page=pagination.next_num) }}">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Page info -->
+    <div class="row mt-2">
+        <div class="col-12 text-center text-muted">
+            <small>
+                Page {{ pagination.page }} of {{ pagination.total_pages }}
+                {% if pagination.total_pages > 10 %}
+                    | <a href="{{ url_for('main.browse', page=1) }}" class="text-decoration-none">First</a>
+                    | <a href="{{ url_for('main.browse', page=pagination.total_pages) }}" class="text-decoration-none">Last</a>
+                {% endif %}
+            </small>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

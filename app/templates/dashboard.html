@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Fanfiction Explorer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">Fanfiction Database Overview</h1>
+            <p class="lead">Explore millions of fanfiction stories from across the internet.</p>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total Stories</h5>
+                            <h2 class="mb-0">{{ format_number(stats.total_stories) }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-book fa-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Unique Authors</h5>
+                            <h2 class="mb-0">{{ format_number(stats.unique_authors) }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total Words</h5>
+                            <h2 class="mb-0">{{ format_number(stats.total_words) }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-file-alt fa-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Avg Words</h5>
+                            <h2 class="mb-0">{{ format_number(stats.avg_words) }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Top Fandoms by Story Count</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="fandomChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Language Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="languageChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Fandoms Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Top 10 Most Popular Fandoms</h5>
+                    <a href="{{ url_for('main.top_fandoms') }}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Fandom</th>
+                                    <th>Story Count</th>
+                                    <th>Percentage</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fandom in top_fandoms %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td class="fw-bold">{{ fandom[0] or 'Unknown' }}</td>
+                                    <td>{{ format_number(fandom[1]) }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {{ (fandom[1] / top_fandoms[0][1] * 100)|round(1) }}%">
+                                                {{ (fandom[1] / stats.total_stories * 100)|round(2) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.search', category=fandom[0]) }}" class="btn btn-sm btn-outline-primary">
+                                            Browse Stories
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load and display charts
+document.addEventListener('DOMContentLoaded', function() {
+    // Fandom Chart
+    const fandomCtx = document.getElementById('fandomChart').getContext('2d');
+    const fandomData = {{ top_fandoms|tojson }};
+    
+    new Chart(fandomCtx, {
+        type: 'bar',
+        data: {
+            labels: fandomData.map(item => item[0].length > 25 ? item[0].substring(0, 25) + '...' : item[0]),
+            datasets: [{
+                label: 'Story Count',
+                data: fandomData.map(item => item[1]),
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                    '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+                ],
+                borderColor: '#ffffff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Stories by Fandom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            onClick: function(event, elements) {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const fandom = fandomData[index][0];
+                    window.location.href = `/search?category=${encodeURIComponent(fandom)}`;
+                }
+            }
+        }
+    });
+    
+    // Language Chart
+    fetch('/api/stats/languages')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const languageCtx = document.getElementById('languageChart').getContext('2d');
+                
+                new Chart(languageCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.data.map(item => item.name),
+                        datasets: [{
+                            data: data.data.map(item => item.count),
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Search Stories - Fanfiction Explorer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Search Stories</h1>
+            <p class="lead">Find stories by title, author, fandom, or other criteria</p>
+        </div>
+    </div>
+    
+    <!-- Search Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Search Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('main.search') }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" 
+                                       value="{{ query_params.get('title', '') }}" 
+                                       placeholder="Enter story title...">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="author" class="form-label">Author</label>
+                                <input type="text" class="form-control" id="author" name="author" 
+                                       value="{{ query_params.get('author', '') }}" 
+                                       placeholder="Enter author name...">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Fandom/Category</label>
+                                <input type="text" class="form-control" id="category" name="category" 
+                                       value="{{ query_params.get('category', '') }}" 
+                                       placeholder="e.g., Harry Potter, Naruto...">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="genre" class="form-label">Genre</label>
+                                <input type="text" class="form-control" id="genre" name="genre" 
+                                       value="{{ query_params.get('genre', '') }}" 
+                                       placeholder="e.g., Romance, Adventure...">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="language" class="form-label">Language</label>
+                                <select class="form-select" id="language" name="language">
+                                    <option value="">Any Language</option>
+                                    <option value="English" {{ 'selected' if query_params.get('language') == 'English' }}>English</option>
+                                    <option value="Spanish" {{ 'selected' if query_params.get('language') == 'Spanish' }}>Spanish</option>
+                                    <option value="French" {{ 'selected' if query_params.get('language') == 'French' }}>French</option>
+                                    <option value="German" {{ 'selected' if query_params.get('language') == 'German' }}>German</option>
+                                    <option value="Italian" {{ 'selected' if query_params.get('language') == 'Italian' }}>Italian</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">Any Status</option>
+                                    <option value="Completed" {{ 'selected' if query_params.get('status') == 'Completed' }}>Completed</option>
+                                    <option value="In-Progress" {{ 'selected' if query_params.get('status') == 'In-Progress' }}>In Progress</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label for="rating" class="form-label">Rating</label>
+                                <select class="form-select" id="rating" name="rating">
+                                    <option value="">Any Rating</option>
+                                    <option value="K" {{ 'selected' if query_params.get('rating') == 'K' }}>K (General)</option>
+                                    <option value="K+" {{ 'selected' if query_params.get('rating') == 'K+' }}>K+ (Some content)</option>
+                                    <option value="T" {{ 'selected' if query_params.get('rating') == 'T' }}>T (Teen)</option>
+                                    <option value="M" {{ 'selected' if query_params.get('rating') == 'M' }}>M (Mature)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label for="per_page" class="form-label">Results per page</label>
+                                <select class="form-select" id="per_page" name="per_page">
+                                    <option value="25" {{ 'selected' if query_params.get('per_page') == '25' }}>25</option>
+                                    <option value="50" {{ 'selected' if query_params.get('per_page', '50') == '50' }}>50</option>
+                                    <option value="100" {{ 'selected' if query_params.get('per_page') == '100' }}>100</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="min_words" class="form-label">Minimum Words</label>
+                                <input type="number" class="form-control" id="min_words" name="min_words" 
+                                       value="{{ query_params.get('min_words', '') }}" 
+                                       placeholder="e.g., 1000">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="max_words" class="form-label">Maximum Words</label>
+                                <input type="number" class="form-control" id="max_words" name="max_words" 
+                                       value="{{ query_params.get('max_words', '') }}" 
+                                       placeholder="e.g., 100000">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                                <button type="submit" name="show_all" value="1" class="btn btn-secondary me-2">
+                                    <i class="fas fa-list"></i> Show All
+                                </button>
+                                <a href="{{ url_for('main.search') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Clear
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Search Results -->
+    {% if results is defined %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        Search Results
+                        {% if pagination %}
+                            ({{ format_number(pagination.total_count) }} total, showing {{ pagination.per_page * (pagination.page - 1) + 1 }}-{{ pagination.per_page * pagination.page if pagination.per_page * pagination.page < pagination.total_count else pagination.total_count }})
+                        {% endif %}
+                    </h5>
+                </div>
+                
+                {% if results %}
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Fandom</th>
+                                    <th>Genre</th>
+                                    <th>Language</th>
+                                    <th>Status</th>
+                                    <th>Words</th>
+                                    <th>Chapters</th>
+                                    <th>Rating</th>
+                                    <th>Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for story in results %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('main.story_detail', story_id=story[10]) }}" class="text-decoration-none fw-bold">
+                                            {{ truncate_text(story[0], 50) }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.search', author=story[1]) }}" class="text-decoration-none">
+                                            {{ truncate_text(story[1], 30) }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.search', category=story[2]) }}" class="text-decoration-none">
+                                            {{ truncate_text(story[2], 25) }}
+                                        </a>
+                                    </td>
+                                    <td>{{ truncate_text(story[3], 20) }}</td>
+                                    <td>{{ story[4] }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if story[5] == 'Completed' else 'warning' }}">
+                                            {{ story[5] }}
+                                        </span>
+                                    </td>
+                                    <td>{{ format_number(story[6]) }}</td>
+                                    <td>{{ format_number(story[7]) }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ story[8] }}</span>
+                                    </td>
+                                    <td class="small">{{ story[9] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5>No stories found</h5>
+                    <p class="text-muted">Try adjusting your search criteria or browse all stories.</p>
+                    <a href="{{ url_for('main.browse') }}" class="btn btn-primary">Browse All Stories</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if pagination and pagination.total_pages > 1 %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Search results pagination">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous page -->
+                    {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.search', page=pagination.prev_num, **query_params) }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Page numbers -->
+                    {% set start_page = [pagination.page - 2, 1]|max %}
+                    {% set end_page = [pagination.page + 2, pagination.total_pages]|min %}
+                    
+                    {% if start_page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.search', page=1, **query_params) }}">1</a>
+                        </li>
+                        {% if start_page > 2 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% for page_num in range(start_page, end_page + 1) %}
+                        {% if page_num == pagination.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('main.search', page=page_num, **query_params) }}">{{ page_num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if end_page < pagination.total_pages %}
+                        {% if end_page < pagination.total_pages - 1 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.search', page=pagination.total_pages, **query_params) }}">{{ pagination.total_pages }}</a>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Next page -->
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.search', page=pagination.next_num, **query_params) }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
