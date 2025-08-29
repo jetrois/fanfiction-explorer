@@ -8,11 +8,13 @@ def create_app():
     """Application factory pattern"""
     app = Flask(__name__)
     
-    # Configuration
+    # Configuration - Use environment variables with fallback defaults
+    database_path = os.environ.get('DATABASE_PATH', '/Users/Azrael/Development/Fichub SQL/metadata-full.sqlite')
+    
     app.config.update(
-        DATABASE_PATH='/Users/Azrael/Development/Fichub SQL/metadata-full.sqlite',
-        SECRET_KEY='your-secret-key-here-change-in-production',
-        DEBUG=True,
+        DATABASE_PATH=database_path,
+        SECRET_KEY=os.environ.get('SECRET_KEY', 'your-secret-key-here-change-in-production'),
+        DEBUG=os.environ.get('FLASK_DEBUG', 'True').lower() in ['true', '1', 'yes'],
         JSON_SORT_KEYS=False
     )
     

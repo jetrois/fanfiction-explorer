@@ -79,16 +79,48 @@ A web application to explore and analyze your fanfiction database with interacti
 
 The application can be configured via environment variables:
 
+### Environment Variables
+
 ```bash
+# Database Configuration
+export DATABASE_PATH='/path/to/your/metadata-full.sqlite'
+
+# Flask Configuration  
 export FLASK_HOST=127.0.0.1        # Server host
 export FLASK_PORT=5000             # Server port
 export FLASK_DEBUG=True            # Debug mode
+export SECRET_KEY='your-secret-key'
 ```
 
-### Database Path
-Update the database path in `app/__init__.py`:
-```python
-DATABASE_PATH='/path/to/your/metadata-full.sqlite'
+### Database Path Options
+
+**Option 1: Environment Variable (Recommended)**
+```bash
+export DATABASE_PATH='/Volumes/UNPS1/Linux/Web/Fanfiction Search/metadata-full.sqlite'
+venv/bin/python run.py
+```
+
+**Option 2: Using the NAS Script (Direct - May have limitations)**
+```bash
+# Use the pre-configured script for direct NAS access
+venv/bin/python run_with_nas_db.py
+```
+
+**Option 3: Using the NAS Copy Script (Recommended for NAS)**
+```bash
+# Copy database from NAS to local storage for optimal performance
+venv/bin/python run_with_nas_copy.py
+```
+
+> **💡 NAS Performance Tip**: SQLite works best with local files. The copy script automatically syncs from your NAS and provides the best performance.
+
+**Option 4: Using .env file**
+```bash
+# Copy the example environment file
+cp .env.example .env
+# Edit .env with your database path
+# Then load and run:
+export $(cat .env | xargs) && venv/bin/python run.py
 ```
 
 ## 🛠️ API Endpoints
@@ -191,8 +223,9 @@ venv/bin/python manage.py analyze
 ### Common Issues
 
 1. **Database not found:**
-   - Verify the database path in `app/__init__.py`
+   - Check the DATABASE_PATH environment variable or use the default path
    - Ensure the SQLite file exists and is readable
+   - For NAS setups, verify the mount point `/Volumes/UNPS1/` is accessible
 
 2. **Import errors:**
    - Make sure virtual environment is activated

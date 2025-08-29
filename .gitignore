@@ -37,6 +37,9 @@ instance/
 *.sqlite3
 *.db
 
+# Local data directory (for NAS database copies)
+data/
+
 # Logs
 logs/
 *.log
